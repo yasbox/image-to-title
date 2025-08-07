@@ -3,45 +3,69 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "image-to-title",
-	"main": "src/index.ts",
-	"compatibility_date": "2025-07-30",
-	"observability": {
-		"enabled": true
-	},
-	/**
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "image-to-title",
+    "main": "src/index.ts",
+    "compatibility_date": "2025-07-30",
+    "observability": {
+        "enabled": true
+    },
+    /**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
-	// "placement": { "mode": "smart" },
-
-	/**
+    // "placement": { "mode": "smart" },
+    /**
 	 * Bindings
 	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
 	 * databases, object storage, AI inference, real-time communication and more.
 	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
-
-	/**
+    // KVストレージの設定
+    "kv_namespaces": [
+        {
+            "binding": "SESSIONS_KV",
+            "id": "cc1794467565490f8db07abba265a1cb",
+            "preview_id": "9d75996461954e9d92dee95eb3bc93a9"
+        },
+        {
+            "binding": "RATE_LIMIT_KV",
+            "id": "5499fc8847bb4802a4bdd34559bcc4a6",
+            "preview_id": "ca676ca5038945cda7a582ff38cbcf86"
+        }
+    ],
+    /**
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
+	 * 
+	 * 注意: 機密情報は以下の方法で管理してください:
+	 * - 開発環境: .dev.varsファイル（.gitignoreに含まれている）
+	 * - 本番環境: wrangler secret put コマンドまたはCloudflare Dashboard
+	 * 
+	 * 例: wrangler secret put PAGE_PASSWORD
 	 */
-	// "vars": { "MY_VARIABLE": "production_value" },
-	/**
+    "vars": {
+        // 機密情報は .dev.vars または wrangler secret で管理
+        // "API_KEYS": "your-api-keys-here",
+        // "FRONTEND_API_KEY": "your-frontend-key-here", 
+        // "PAGE_PASSWORD": "your-password-here"
+    },
+    /**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-
-	/**
+    /**
 	 * Static Assets
 	 * https://developers.cloudflare.com/workers/static-assets/binding/
 	 */
-	"assets": { "directory": "./public/", "binding": "ASSETS" },
-
-	/**
+    "assets": {
+        "directory": "./public/",
+        "binding": "ASSETS",
+        "html_handling": "none" // 認証が有効にならない問題の対処
+    },
+    /**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
 	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+    // "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
 }

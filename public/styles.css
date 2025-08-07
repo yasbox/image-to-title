@@ -61,17 +61,40 @@ body::before {
     border: 1px solid var(--border-primary);
 }
 
-h1 {
-    text-align: center;
-    color: var(--text-primary);
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 40px;
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.header h1 {
+    margin-bottom: 0;
+    font-size: 2rem;
+}
+
+.logout-btn {
     background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-secondary);
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
 }
 
 .main-content {

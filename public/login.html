@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - 画像からタイトル生成</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-title {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .password-input {
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .password-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin-top: 0.5rem;
+            display: none;
+            padding: 0.5rem;
+            background-color: #fdf2f2;
+            border-radius: 5px;
+            border: 1px solid #fecaca;
+        }
+        
+        .loading {
+            display: none;
+            margin-left: 0.5rem;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .session-status {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .session-status.valid {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .session-status.invalid {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="login-title">画像からタイトル生成</h1>
+        <form class="login-form" id="loginForm">
+            <input type="password" class="password-input" id="passwordInput" placeholder="パスワードを入力してください" required>
+            <button type="submit" class="login-btn" id="loginBtn">
+                ログイン
+                <span class="loading" id="loading"></span>
+            </button>
+        </form>
+        <div class="error-message" id="errorMessage">パスワードが正しくありません。</div>
+        <div class="session-status" id="sessionStatus" style="display: none;"></div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('passwordInput');
+        const errorMessage = document.getElementById('errorMessage');
+        const loginBtn = document.getElementById('loginBtn');
+        const loading = document.getElementById('loading');
+        const sessionStatus = document.getElementById('sessionStatus');
+
+        // ページ読み込み時にセッション状態を確認
+        async function checkSessionStatus() {
+            try {
+                console.log('=== CHECK SESSION STATUS (FRONTEND) ===')
+                console.log('Checking session status...')
+                const response = await fetch('/api/session/status', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                })
+                const data = await response.json()
+                
+                console.log('Session status response:', data)
+                
+                // より厳密なセッション検証
+                const isValidSession = data.authenticated === true && 
+                    data.sessionId && 
+                    data.sessionInfo && 
+                    !data.sessionInfo.isExpired &&
+                    data.sessionInfo.remainingTime > 0 &&
+                    data.sessionInfo.remainingTime < 3600000; // 1時間以内のセッションのみ有効
+                
+                console.log('Session validation result:', {
+                    authenticated: data.authenticated,
+                    sessionId: data.sessionId,
+                    sessionInfo: data.sessionInfo,
+                    isExpired: data.sessionInfo?.isExpired,
+                    remainingTime: data.sessionInfo?.remainingTime,
+                    isValidSession: isValidSession
+                })
+                
+                if (isValidSession) {
+                    console.log('Valid session found, redirecting...')
+                    sessionStatus.textContent = '既にログイン済みです。リダイレクトしています...'
+                    sessionStatus.className = 'session-status valid'
+                    sessionStatus.style.display = 'block'
+                    
+                    // 少し待ってからリダイレクト
+                    setTimeout(() => {
+                        window.location.href = '/'
+                    }, 1000)
+                } else {
+                    console.log('No valid session found, clearing cookies...')
+                    // セッションが無効な場合は、クッキーを手動で削除
+                    document.cookie = 'session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict; HttpOnly; Secure'
+                    document.cookie = 'session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+                    
+                    // セッション状態を表示
+                    if (data.reason) {
+                        sessionStatus.textContent = `セッションが無効です (${data.reason})`
+                        sessionStatus.className = 'session-status invalid'
+                        sessionStatus.style.display = 'block'
+                    } else {
+                        sessionStatus.textContent = 'ログインが必要です'
+                        sessionStatus.className = 'session-status invalid'
+                        sessionStatus.style.display = 'block'
+                    }
+                }
+            } catch (error) {
+                console.error('Session status check failed:', error)
+                // エラーが発生した場合も、クッキーを手動で削除
+                document.cookie = 'session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+                
+                sessionStatus.textContent = 'セッション状態の確認に失敗しました'
+                sessionStatus.className = 'session-status invalid'
+                sessionStatus.style.display = 'block'
+            }
+        }
+
+        // ページ読み込み時にセッション状態を確認
+        checkSessionStatus();
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const password = passwordInput.value;
+            
+            if (!password.trim()) {
+                showError('パスワードを入力してください。');
+                return;
+            }
+            
+            // ローディング状態を表示
+            loginBtn.disabled = true;
+            loading.style.display = 'inline-block';
+            errorMessage.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                if (response.ok) {
+                    // ログイン成功
+                    sessionStatus.textContent = 'ログインに成功しました。リダイレクトしています...';
+                    sessionStatus.className = 'session-status valid';
+                    sessionStatus.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    // ログイン失敗
+                    const errorData = await response.json().catch(() => ({}));
+                    showError(errorData.error || 'パスワードが正しくありません。');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('ログイン処理中にエラーが発生しました。');
+            } finally {
+                // ローディング状態を解除
+                loginBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        // エンターキーでログイン
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !loginBtn.disabled) {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // パスワード入力時にエラーメッセージを隠す
+        passwordInput.addEventListener('input', () => {
+            if (errorMessage.style.display === 'block') {
+                errorMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
