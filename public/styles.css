@@ -55,7 +55,7 @@ body::before {
     border-radius: 20px;
     box-shadow: var(--shadow-primary);
     padding: 40px;
-    max-width: 1200px;
+    max-width: 800px;
     width: 100%;
     position: relative;
     border: 1px solid var(--border-primary);
@@ -73,28 +73,32 @@ body::before {
 .header h1 {
     margin-bottom: 0;
     font-size: 2rem;
+    font-weight: 700;
 }
 
 .logout-btn {
-    background: var(--accent-gradient);
-    color: white;
+    background: none;
+    color: var(--text-secondary);
     border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 400;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 .logout-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-glow);
+    color: var(--accent-primary);
+    background: none;
+    transform: none;
+    box-shadow: none;
 }
 
 .logout-btn:active {
-    transform: translateY(0);
+    transform: none;
 }
 
 .main-content {
@@ -172,7 +176,7 @@ body::before {
 .preview-container {
     text-align: center;
     position: relative;
-    min-height: 200px;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -301,8 +305,6 @@ body::before {
     box-shadow: var(--shadow-secondary);
 }
 
-
-
 .error-message {
     color: #dc2626;
     font-size: 1.1rem;
@@ -325,41 +327,231 @@ body::before {
     box-shadow: var(--shadow-secondary);
 }
 
-/* レスポンシブデザイン */
-@media (max-width: 1024px) {
+/* レスポンシブデザイン - デスクトップ */
+@media (min-width: 1024px) {
     .container {
-        padding: 32px 24px;
-        max-width: 600px;
+        padding: 40px;
+        max-width: 800px;
     }
     
-    h1 {
-        font-size: 2.25rem;
+    .header h1 {
+        font-size: 2.5rem;
     }
 }
 
-@media (max-width: 768px) {
+/* レスポンシブデザイン - タブレット */
+@media (max-width: 1023px) and (min-width: 768px) {
     .container {
-        padding: 24px 20px;
-        margin: 16px;
+        padding: 32px 24px;
+        max-width: 700px;
+        margin: 20px;
     }
     
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 32px;
+    .header h1 {
+        font-size: 2.25rem;
     }
     
     .upload-area {
-        padding: 32px 20px;
-        min-height: 160px;
+        padding: 36px 24px;
+        min-height: 180px;
     }
     
     .upload-icon {
-        font-size: 2.5rem;
+        font-size: 2.75rem;
     }
     
     .result-text {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
+        padding: 18px;
+    }
+}
+
+/* レスポンシブデザイン - モバイル */
+@media (max-width: 767px) {
+    body {
+        padding: 0;
+        background: var(--bg-primary);
+        align-items: flex-start;
+        justify-content: flex-start;
+        min-height: 100vh;
+    }
+    
+    .container {
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding: 20px 16px;
+        margin: 0;
+        border-radius: 0;
+        max-width: none;
+        width: 100%;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        margin-bottom: 24px;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .header h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0;
+    }
+    
+    .logout-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+    
+    .main-content {
+        gap: 20px;
+        max-width: none;
+    }
+    
+    .left-panel {
+        gap: 20px;
+    }
+    
+    .upload-area {
+        padding: 24px 16px;
+        min-height: 140px;
+        border-radius: 12px;
+        background: var(--bg-secondary);
+        border: 2px dashed var(--border-secondary);
+    }
+    
+    .upload-icon {
+        font-size: 2rem;
+        margin-bottom: 12px;
+    }
+    
+    .upload-text {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+    
+    .upload-hint {
+        font-size: 0.8rem;
+    }
+    
+    .preview-container {
+        min-height: 0;
+    }
+    
+    #imagePreview {
+        max-height: 250px;
+        border-radius: 8px;
+    }
+    
+    .generate-btn {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+        border-radius: 10px;
+    }
+    
+    .right-panel {
+        gap: 20px;
+    }
+    
+    .loading {
+        padding: 32px 16px;
+        min-height: 160px;
+        border-radius: 12px;
+        background: var(--bg-secondary);
+    }
+    
+    .spinner {
+        width: 28px;
+        height: 28px;
+        margin-bottom: 12px;
+    }
+    
+    .loading div:last-child {
+        font-size: 0.9rem;
+    }
+    
+    .result-container {
+        padding: 20px 16px;
+        min-height: 160px;
+        border-radius: 12px;
+        background: var(--bg-secondary);
+    }
+    
+    .result-title {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+    
+    .result-text {
+        font-size: 1.1rem;
         padding: 16px;
+        border-radius: 8px;
+    }
+    
+    .error {
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+}
+
+/* レスポンシブデザイン - 小型モバイル */
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+    }
+    
+    .container {
+        padding: 16px 12px;
+        margin: 0;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .logout-btn {
+        padding: 4px 6px;
+        font-size: 0.65rem;
+    }
+    
+    .upload-area {
+        padding: 20px 12px;
+        min-height: 120px;
+    }
+    
+    .upload-icon {
+        font-size: 1.75rem;
+        margin-bottom: 8px;
+    }
+    
+    .upload-text {
+        font-size: 0.9rem;
+    }
+    
+    .upload-hint {
+        font-size: 0.75rem;
+    }
+    
+    .preview-container {
+        min-height: 0;
+    }
+    
+    #imagePreview {
+        max-height: 200px;
+    }
+    
+    .generate-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .result-text {
+        font-size: 1rem;
+        padding: 12px;
     }
 }
 
